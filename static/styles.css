@@ -1,0 +1,18 @@
+.table td {
+    background-color: rgb(200, 245, 247);
+    border: 1px solid #dddddd;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.table .td-right {
+    text-align: right;
+}
+
+.table .th-footer {
+    text-align: right;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+body {
+    background-color: aliceblue;
+}

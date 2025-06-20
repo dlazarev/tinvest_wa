@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>TINVEST</title>
+        <link rel="stylesheet" href="/static/styles.css" />
+    </head>
+    <body>
+
+        <div>
+            <form method="post">
+            <progress id="progressBar" max="100" value="0"></progress>
+            <p id="statusText">statusText</p>
+            </form>
+        </div>
+
+        <h1>TINVEST</h1>
+        <table class="table">
+            {{range .Accs}}
+                <tr>
+                    <td>{{.Id}}</td><td>{{.Name}}</td><td id="acc_{{.Id}}" class="td-right">{{.Sum}}</td>
+                </tr>
+            {{end}}
+            <tr>
+                <th id="totalSum" class="th-footer" colspan="3">{{.Total}}</th>
+            </tr>
+        </table>
+        <script>
+            const progressBar = document.getElementById('progressBar');
+            const statusText = document.getElementById('statusText');
+            const totalSum = document.getElementById('totalSum');
+
+            const ws = new WebSocket('ws://localhost:8901/ws');
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                progressBar.style.width = `${data.percent}%`;
+                totalSum.textContent = data.totalsum;
+                for (const i in data.accounts) {
+                    console.log(data.accounts[i].Id)
+                    const accountSum = document.getElementById("acc_" + data.accounts[i].Id)
+                    accountSum.textContent = data.accounts[i].Sum
+                }
+                statusText.textContent = data.executing
+                    ? `Выполнение: ${data.percent}%`
+                    : 'Выполнение завершено';
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            document.addEventListener('visibilitychange', function() {
+                if (ws.readyState === WebSocket.OPEN) {
+                    const state = document.visibilityState;
+                    ws.send(JSON.stringify({
+                        type: 'visibilityChange',
+                        state: state
+                    }));
+                }
+                if (document.visibilityState === "visible") {
+                    console.log("page is visible")
+                } else {
+                    console.log("page is hidden")
+                }
+            });
+        </script>
+    </body>
+</html>
