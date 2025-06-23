@@ -7,7 +7,6 @@ import (
 	"ldv/tinvest/operations"
 	"ldv/tinvest/users"
 	"log"
-	"math/rand"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -50,8 +49,14 @@ func (t *TaskStatus) clear() {
 	t.TotalSum = ""
 }
 
+type VisibilityMessage struct {
+	Type  string `json:"type"`
+	State string `json:"state"`
+}
+
 var bearer_token string
 var accounts users.AccountsData
+var visibilityMessage VisibilityMessage
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
@@ -60,11 +65,6 @@ var upgrader = websocket.Upgrader{
 func (h *HtmlData) clear() {
 	h.Accs = (h.Accs)[:0]
 	h.Total = 0.0
-}
-
-type VisibilityMessage struct {
-	Type  string `json:"type"`
-	State string `json:"state"`
 }
 
 //****************************************************************
@@ -76,11 +76,11 @@ func task(events chan TaskStatus) {
 
 	taskStatus := TaskStatus{Executing: true}
 
-	for taskStatus.Percent < 100 {
-		taskStatus.Percent += rand.Intn(10) + 1
-		if taskStatus.Percent > 100 {
-			taskStatus.Percent = 100
-			taskStatus.Executing = false
+	for {
+
+		if visibilityMessage.State == "hidden" {
+			time.Sleep(time.Second)
+			continue
 		}
 
 		htmlData.clear()
@@ -104,12 +104,21 @@ func task(events chan TaskStatus) {
 
 //************************************************************************
 
-func receiveMsg(events chan VisibilityMessage) {
+func receiveMsg(conn *websocket.Conn) {
 	msg := VisibilityMessage{Type: "visibilityMessage"}
 	for {
-		events <- msg
+		err := conn.ReadJSON(&msg)
+		if err != nil {
+			log.Println("Error reading msg from client: ", err)
+			return
+		}
+		if msg.Type == "visibilityChange" {
+			visibilityMessage.State = msg.State
+		}
+		log.Println(msg)
+		//		events <- msg
 		log.Println("receiveMsg() tik...")
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second)
 	}
 }
 
@@ -124,10 +133,10 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	events := make(chan TaskStatus, 10)
-	visibilityMsg := make(chan VisibilityMessage, 10)
+	//	visibilityMsg := make(chan VisibilityMessage, 10)
 
 	go task(events)
-	go receiveMsg(visibilityMsg)
+	go receiveMsg(conn)
 
 	for {
 		select {
@@ -144,14 +153,6 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			log.Println(status)
 
-		case msg := <-visibilityMsg:
-			err = conn.ReadJSON(&msg)
-			if err != nil {
-				log.Println("Error reading msg from client: ", err)
-				return
-			}
-			log.Println(msg)
-
 		case <-r.Context().Done():
 			log.Println("Context Done")
 			return
@@ -167,6 +168,7 @@ func main() {
 
 	bearer_token = ini.String("Authorization.token")
 	accounts = users.GetAccounts(bearer_token)
+	visibilityMessage.State = "visible"
 
 	// Обработчик для статических файлов (css, js, изображения)
 	fs := http.FileServer(http.Dir("static"))
