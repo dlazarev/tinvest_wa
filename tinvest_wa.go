@@ -9,6 +9,9 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gookit/ini/v2"
@@ -67,6 +70,17 @@ func (h *HtmlData) clear() {
 	h.Total = 0.0
 }
 
+func goid() int {
+	var buf [64]byte
+	n := runtime.Stack(buf[:], false)
+	idField := strings.Fields(strings.TrimPrefix(string(buf[:n]), "goroutine "))[0]
+	id, err := strconv.Atoi(idField)
+	if err != nil {
+		panic(fmt.Sprintf("cannot get goroutine id: %v", err))
+	}
+	return id
+}
+
 //****************************************************************
 
 func task(events chan TaskStatus) {
@@ -77,6 +91,10 @@ func task(events chan TaskStatus) {
 	taskStatus := TaskStatus{Executing: true}
 
 	for {
+
+		if visibilityMessage.Type == "clientExit" {
+			return
+		}
 
 		if visibilityMessage.State == "hidden" {
 			time.Sleep(time.Second)
@@ -97,7 +115,7 @@ func task(events chan TaskStatus) {
 		taskStatus.TotalSum = htmlData.Total.String()
 
 		events <- taskStatus
-		log.Println("task() tick...")
+		log.Println("task() tick...", goid())
 		time.Sleep(time.Second * 5)
 	}
 }
@@ -109,6 +127,7 @@ func receiveMsg(conn *websocket.Conn) {
 	for {
 		err := conn.ReadJSON(&msg)
 		if err != nil {
+			visibilityMessage.Type = "clientExit"
 			log.Println("Error reading msg from client: ", err)
 			return
 		}
@@ -133,7 +152,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	events := make(chan TaskStatus, 10)
-	//	visibilityMsg := make(chan VisibilityMessage, 10)
+	visibilityMessage.Type = "clientStart"
 
 	go task(events)
 	go receiveMsg(conn)
