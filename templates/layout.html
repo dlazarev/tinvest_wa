@@ -6,14 +6,6 @@
         <link rel="stylesheet" href="/static/styles.css" />
     </head>
     <body>
-
-        <div>
-            <form method="post">
-            <progress id="progressBar" max="100" value="0"></progress>
-            <p id="statusText">statusText</p>
-            </form>
-        </div>
-
         <h1>TINVEST</h1>
         <table class="table">
             {{range .Accs}}
@@ -26,24 +18,18 @@
             </tr>
         </table>
         <script>
-            const progressBar = document.getElementById('progressBar');
-            const statusText = document.getElementById('statusText');
             const totalSum = document.getElementById('totalSum');
 
             const ws = new WebSocket('ws://localhost:8901/ws');
 
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                progressBar.style.width = `${data.percent}%`;
                 totalSum.textContent = data.totalsum;
                 for (const i in data.accounts) {
                     console.log(data.accounts[i].Id)
                     const accountSum = document.getElementById("acc_" + data.accounts[i].Id)
                     accountSum.textContent = data.accounts[i].Sum
                 }
-                statusText.textContent = data.executing
-                    ? `Выполнение: ${data.percent}%`
-                    : 'Выполнение завершено';
             };
 
             ws.onerror = (error) => {
