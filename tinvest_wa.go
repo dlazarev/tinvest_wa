@@ -84,15 +84,17 @@ func goid() int {
 //****************************************************************
 
 func task(events chan TaskStatus) {
-
+	log.Println("task() start...")
 	var pfl operations.Portfolio
 	var htmlData HtmlData
 
 	taskStatus := TaskStatus{Executing: true}
+	visibilityMessage.State = "visible"
 
 	for {
 
 		if visibilityMessage.Type == "clientExit" {
+			log.Println("task(): receive meaasge type clientExit. Done.")
 			return
 		}
 
@@ -123,6 +125,7 @@ func task(events chan TaskStatus) {
 //************************************************************************
 
 func receiveMsg(conn *websocket.Conn) {
+	log.Println("receiveMsg() start...")
 	msg := VisibilityMessage{Type: "visibilityMessage"}
 	for {
 		err := conn.ReadJSON(&msg)
