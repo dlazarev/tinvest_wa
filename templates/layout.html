@@ -10,7 +10,7 @@
         <table class="table">
             {{range .Accs}}
                 <tr>
-                    <td>{{.Id}}</td><td>{{.Name}}</td><td id="acc_{{.Id}}" class="td-right">{{.Sum}}</td>
+                    <td><a class="link" href="acc">{{.Id}}</td><td>{{.Name}}</td><td id="acc_{{.Id}}" class="td-right">{{.Sum}}</a></td>
                 </tr>
             {{end}}
             <tr>

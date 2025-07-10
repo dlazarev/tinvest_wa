@@ -8,6 +8,8 @@ import (
 	"ldv/tinvest/users"
 	"log"
 	"net/http"
+	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -183,7 +185,13 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	err := ini.LoadFiles("t-invest.ini")
+	exepath, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	path := path.Dir(exepath)
+	fullname := filepath.Join(path, "t-invest.ini")
+	err = ini.LoadFiles(fullname)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -202,7 +210,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		var pfl operations.Portfolio
 
-		tmplPath := filepath.Join("templates", "layout.html")
+		tmplPath := filepath.Join(path, "templates", "layout.html")
 		tmpl, err := template.ParseFiles(tmplPath)
 		if err != nil {
 			http.Error(w, "Ошибка загрузки шаблона", http.StatusInternalServerError)

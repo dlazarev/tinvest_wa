@@ -1,8 +1,8 @@
 .table td {
     background-color: rgb(202, 247, 173);
-    border: 1px solid #338d4e;
+    border: 1px solid rgb(202, 247, 173);
     font-family: proxima_novasemibold, sans-serif;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .table .td-right {
@@ -17,4 +17,18 @@
 
 body {
     background-color: rgb(238, 233, 192);
+}
+
+.table td:hover {
+    background-color: cadetblue;
+    color: blanchedalmond;
+    cursor:pointer;
+    border: 1px solid #338d4e;
+    box-shadow: 2px 2px 5 px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.link {
+    text-decoration: none;
+    color: inherit;
 }
