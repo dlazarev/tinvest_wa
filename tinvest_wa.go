@@ -233,5 +233,23 @@ func main() {
 		}
 	})
 
+	// Обработчик страницы брокерского счета
+	http.HandleFunc("/acc", func(w http.ResponseWriter, r *http.Request) {
+		tmplPath := filepath.Join(path, "templates", "acc.html")
+		tmpl, err := template.ParseFiles(tmplPath)
+		if err != nil {
+			http.Error(w, "Ошибка загрузки шаблона", http.StatusInternalServerError)
+			return
+		}
+
+		var htmlData HtmlData
+
+		err = tmpl.Execute(w, htmlData)
+		if err != nil {
+			http.Error(w, "Ошибка рендеринга шаблона", http.StatusInternalServerError)
+			return
+		}
+	})
+
 	http.ListenAndServe(":8901", nil)
 }
