@@ -37,6 +37,9 @@ type HtmlData struct {
 	Total SumFloat
 }
 
+type AccDetail struct {
+	Account Acc
+}
 type Account struct {
 	Id  string
 	Sum string
@@ -239,12 +242,24 @@ func main() {
 		tmpl, err := template.ParseFiles(tmplPath)
 		if err != nil {
 			http.Error(w, "Ошибка загрузки шаблона", http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 
-		var htmlData HtmlData
+		var accDetail AccDetail
 
-		err = tmpl.Execute(w, htmlData)
+		accId := (r.URL.Query().Get("id"))
+		for _, a := range accounts.Accounts {
+			if a.Id == accId {
+				pfl := operations.GetPortfolio(bearer_token, a.Id)
+				accDetail.Account.Id = a.Id
+				accDetail.Account.Name = a.Name
+				accDetail.Account.Sum = SumFloat(pfl.TotalAmountPortfolio.Sum())
+				break
+			}
+		}
+
+		err = tmpl.Execute(w, accDetail)
 		if err != nil {
 			http.Error(w, "Ошибка рендеринга шаблона", http.StatusInternalServerError)
 			return
