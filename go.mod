@@ -2,11 +2,11 @@ module tinvest_wa
 
 go 1.24.4
 
-replace ldv/tinvest/users => /mnt/wd/nextCloud/src/go/src/ldv/tinvest/users
+replace ldv/tinvest/users => ../ldv/tinvest/users
 
-replace ldv/tinvest => /mnt/wd/nextCloud/src/go/src/ldv/tinvest
+replace ldv/tinvest => ../ldv/tinvest
 
-replace ldv/tinvest/operations => /mnt/wd/nextCloud/src/go/src/ldv/tinvest/operations
+replace ldv/tinvest/operations => ../ldv/tinvest/operations
 
 require (
 	github.com/gookit/ini/v2 v2.3.1

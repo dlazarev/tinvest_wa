@@ -262,6 +262,10 @@ func main() {
 			}
 		}
 
+		var pos operations.Positions
+		pos = operations.GetPositions(bearer_token, accId)
+		fmt.Println(pos)
+
 		err = tmpl.Execute(w, accDetail)
 		if err != nil {
 			http.Error(w, "Ошибка рендеринга шаблона", http.StatusInternalServerError)

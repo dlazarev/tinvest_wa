@@ -17,6 +17,7 @@
 
 body {
     background-color: rgb(238, 233, 192);
+    font-family: proxima_novasemibold, sans-serif;
 }
 
 .table td:hover {
