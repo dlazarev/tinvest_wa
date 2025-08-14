@@ -20,6 +20,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// https://invest-brands.cdn-tinkoff.ru/<logoName>x<size>.png
+// Таким образом, файл логотипа лежит на CDN Tinkoff по пути
+// https://invest-brands.cdn-tinkoff.ru/ с добавлением имени файла и размера.
+
 type SumFloat float64
 
 func (sf SumFloat) String() string {
@@ -40,7 +44,9 @@ type HtmlData struct {
 type AccDetail struct {
 	Account    Acc
 	DailyYield SumFloat
+	Pos        operations.Positions
 }
+
 type Account struct {
 	Id  string
 	Sum string
@@ -258,13 +264,10 @@ func main() {
 				accDetail.Account.Name = a.Name
 				accDetail.Account.Total = SumFloat(pfl.TotalAmountPortfolio.Sum())
 				accDetail.DailyYield = SumFloat(pfl.DailyYield.Sum())
+				accDetail.Pos = operations.GetPositions(bearer_token, accId)
 				break
 			}
 		}
-
-		var pos operations.Positions
-		pos = operations.GetPositions(bearer_token, accId)
-		fmt.Println(pos)
 
 		err = tmpl.Execute(w, accDetail)
 		if err != nil {
