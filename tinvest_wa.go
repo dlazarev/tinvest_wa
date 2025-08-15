@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -16,8 +17,11 @@ import (
 	"strings"
 	"time"
 
+	"database/sql"
+
 	"github.com/gookit/ini/v2"
 	"github.com/gorilla/websocket"
+	_ "modernc.org/sqlite"
 )
 
 // https://invest-brands.cdn-tinkoff.ru/<logoName>x<size>.png
@@ -91,6 +95,28 @@ func goid() int {
 		panic(fmt.Sprintf("cannot get goroutine id: %v", err))
 	}
 	return id
+}
+
+var db *sql.DB
+
+func initDatabase(dbPath string) error {
+	var err error
+	db, err = sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil
+	}
+
+	_, err = db.ExecContext(context.Background(),
+		`CREATE TABLE IF NOT EXISTS securityLogo (
+				figi TEXT PRIMARY KEY,
+				url TEXT,
+				data BLOB)`,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //****************************************************************
@@ -194,6 +220,8 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//************************************************************************
+
 func main() {
 	exepath, err := os.Executable()
 	if err != nil {
@@ -201,7 +229,14 @@ func main() {
 	}
 	path := path.Dir(exepath)
 	fullname := filepath.Join(path, "t-invest.ini")
+	dbFilename := filepath.Join(path, "t-invest.sqlite")
+
 	err = ini.LoadFiles(fullname)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = initDatabase(dbFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
