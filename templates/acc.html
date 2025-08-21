@@ -9,7 +9,7 @@
         <h1>{{.Account.Name}} {{.Account.Total}} Доходность {{.DailyYield}}</h1>
         <ul>
             {{range .Pos.Securities}}
-                <li>{{.}}</li>
+                <li><img src="images/{{.InstrumentDesc.Brand.LogoName}}"> {{.Ticker}} {{.InstrumentDesc.Name}}</li>
             {{end}}
         </ul>
     </body>
