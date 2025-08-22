@@ -1,13 +1,9 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"image"
-	"image/png"
-	_ "image/png"
 	"ldv/tinvest/operations"
 	"ldv/tinvest/users"
 	"log"
@@ -20,11 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"database/sql"
-
 	"github.com/gookit/ini/v2"
 	"github.com/gorilla/websocket"
-	"github.com/sunshineplan/imgconv"
 	_ "modernc.org/sqlite"
 )
 
@@ -106,29 +99,7 @@ func goid() int {
 	return id
 }
 
-var db *sql.DB
 var basePath string
-
-func initDatabase(dbPath string) error {
-	var err error
-	db, err = sql.Open("sqlite", dbPath)
-	if err != nil {
-		return nil
-	}
-
-	_, err = db.ExecContext(context.Background(),
-		`CREATE TABLE IF NOT EXISTS securityLogo (
-				figi TEXT PRIMARY KEY,
-				url TEXT,
-				dateStore DATETIME,
-				data BLOB)`,
-	)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 //****************************************************************
 
@@ -233,43 +204,6 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 //************************************************************************
 
-func updateLogoInDatabase(acc *AccDetail) {
-	for _, sec := range acc.Pos.Securities {
-		if sec.InstrumentDesc.Brand.LogoName != "" {
-			logoName := strings.Replace(sec.InstrumentDesc.Brand.LogoName, ".png", "x160.png", 1)
-			url := logoURL + logoName
-			resp, err := http.Get(url)
-			if err != nil {
-				log.Fatalf("Error fetching logo: %v", err)
-			}
-			defer resp.Body.Close()
-
-			if resp.StatusCode != http.StatusOK {
-				log.Fatalf("Bad status code: %d", resp.StatusCode)
-			}
-
-			img, format, err := image.Decode(resp.Body)
-			if err != nil {
-				log.Fatalf("Error decoding image: %v", err)
-			}
-			mark := imgconv.Resize(img, &imgconv.ResizeOption{Width: 48})
-			markFileName := filepath.Join(basePath, imagePath, sec.InstrumentDesc.Brand.LogoName)
-			f, err := os.Create(markFileName)
-			if err != nil {
-				log.Fatalf("Error file creatre: %v", err)
-			}
-			defer f.Close()
-
-			if err = png.Encode(f, mark); err != nil {
-
-			}
-			fmt.Printf("Image successfully loaded! Format: %s, Dimensions: %dx%d\n", format, img.Bounds().Dx(), img.Bounds().Dy())
-		}
-	}
-}
-
-//************************************************************************
-
 func main() {
 	exepath, err := os.Executable()
 	if err != nil {
@@ -354,7 +288,7 @@ func main() {
 			}
 		}
 
-		updateLogoInDatabase(&accDetail)
+		updateLogo(&accDetail)
 
 		err = tmpl.Execute(w, accDetail)
 		if err != nil {
