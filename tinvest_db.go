@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -67,8 +68,15 @@ func logoActual(figi, url string) bool {
 //************************************************************************
 
 func makeLogoActual(figi, url string, imageData *image.Image) {
-	sql := `UPDATE securityLogo SET figi=?, url=?, dateStore=?, data=?`
-	result, err := db.ExecContext(context.Background(), sql, figi, url, time.Now(), imageData)
+	sql := `UPDATE securityLogo SET url=?, dateStore=?, data=? WHERE figi=?`
+
+	var buf bytes.Buffer
+	err := png.Encode(&buf, *imageData)
+	if err != nil {
+		log.Fatalf("makeLogoActual(). Error encode image data: %v", err)
+	}
+
+	result, err := db.ExecContext(context.Background(), sql, url, time.Now(), buf.Bytes(), figi)
 	if err != nil {
 		log.Fatalf("Error update sql table: %v", err)
 	}
