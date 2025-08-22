@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"image"
 	"image/png"
 	"log"
@@ -56,7 +57,7 @@ func logoActual(figi, url string) bool {
 		if _, err := db.ExecContext(context.Background(), sql, figi, url, now); err != nil {
 			log.Fatalf("Error insert sqlite record: %v", err)
 		}
-		return true
+		return false
 	}
 
 	futureDate := now.AddDate(0, 0, 28)
@@ -65,8 +66,14 @@ func logoActual(figi, url string) bool {
 
 //************************************************************************
 
-func makeLogoActual(figi, url string, imageData image.Image) {
+func makeLogoActual(figi, url string, imageData *image.Image) {
+	sql := `UPDATE securityLogo SET figi=?, url=?, dateStore=?, data=?`
+	result, err := db.ExecContext(context.Background(), sql, figi, url, time.Now(), imageData)
+	if err != nil {
+		log.Fatalf("Error update sql table: %v", err)
+	}
 
+	fmt.Println(result)
 }
 
 //************************************************************************
@@ -106,7 +113,7 @@ func updateLogo(acc *AccDetail) {
 			if err = png.Encode(f, mark); err != nil {
 				log.Fatalf("Error writing image: %v", err)
 			}
-			makeLogoActual(sec.Figi, url, mark)
+			makeLogoActual(sec.Figi, url, &mark)
 		}
 	}
 }
