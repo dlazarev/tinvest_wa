@@ -45,14 +45,15 @@ func initDatabase(dbPath string) error {
 
 //************************************************************************
 
-func logoActual(figi, url string) bool {
+func logoActual(figi, url, logoName string) bool {
 	row := db.QueryRowContext(context.Background(),
-		`SELECT dateStore FROM securityLogo WHERE figi=?`, figi)
+		`SELECT dateStore, data FROM securityLogo WHERE figi=?`, figi)
 
 	var dateStore time.Time
 	var now = time.Now()
+	var data []byte
 
-	err := row.Scan(&dateStore)
+	err := row.Scan(&dateStore, &data)
 	if errors.Is(err, sql.ErrNoRows) {
 		sql := `INSERT INTO securityLogo (figi, url, dateStore) VALUES (?,?,?);`
 		if _, err := db.ExecContext(context.Background(), sql, figi, url, now); err != nil {
@@ -62,7 +63,16 @@ func logoActual(figi, url string) bool {
 	}
 
 	futureDate := now.AddDate(0, 0, 28)
-	return dateStore.Before(futureDate)
+	if dateStore.Before(futureDate) {
+		// Let's check if the logo file is present in the folder.
+		logoPath := filepath.Join(basePath, imagePath, logoName)
+		if _, err := os.Stat(logoPath); os.IsNotExist(err) {
+			if err = os.WriteFile(logoPath, data, 0644); err != nil {
+					log.Fatalf("Error writing file logo: %v", err)
+			}
+		}
+	}
+	return true
 }
 
 //************************************************************************
@@ -92,9 +102,11 @@ func updateLogo(acc *AccDetail) {
 			logoName := strings.Replace(sec.InstrumentDesc.Brand.LogoName, ".png", "x160.png", 1)
 			url := logoURL + logoName
 
-			if logoActual(sec.Figi, url) {
+			if logoActual(sec.Figi, url, sec.InstrumentDesc.Brand.LogoName) {
 				continue
 			}
+
+			log.Printf("Logo for %v not actual. Download it", sec.InstrumentDesc.Ticker)
 
 			resp, err := http.Get(url)
 			if err != nil {
