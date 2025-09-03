@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"ldv/tinvest"
 	"ldv/tinvest/operations"
 	"ldv/tinvest/users"
 	"log"
@@ -30,26 +31,20 @@ const (
 	imagePath = `images`
 )
 
-type SumFloat float64
-
-func (sf SumFloat) String() string {
-	return fmt.Sprintf("%.2f", float64(sf))
-}
-
 type Acc struct {
 	Id    string
 	Name  string
-	Total SumFloat
+	Total tinvest.SumFloat
 }
 
 type HtmlData struct {
 	Accs  []Acc
-	Total SumFloat
+	Total tinvest.SumFloat
 }
 
 type AccDetail struct {
 	Account    Acc
-	DailyYield SumFloat
+	DailyYield tinvest.SumFloat
 	Pos        operations.Positions
 }
 
@@ -128,9 +123,9 @@ func task(events chan TaskStatus) {
 
 		for _, a := range accounts.Accounts {
 			pfl = operations.GetPortfolio(bearer_token, a.Id)
-			i := Acc{a.Id, a.Name, SumFloat(pfl.TotalAmountPortfolio.Sum())}
+			i := Acc{a.Id, a.Name, tinvest.SumFloat(pfl.TotalAmountPortfolio.Sum())}
 			htmlData.Accs = append(htmlData.Accs, i)
-			htmlData.Total += SumFloat(i.Total)
+			htmlData.Total += tinvest.SumFloat(i.Total)
 			j := Account{a.Id, i.Total.String()}
 			taskStatus.Accounts = append(taskStatus.Accounts, j)
 		}
@@ -250,9 +245,9 @@ func main() {
 
 		for _, a := range accounts.Accounts {
 			pfl = operations.GetPortfolio(bearer_token, a.Id)
-			i := Acc{a.Id, a.Name, SumFloat(pfl.TotalAmountPortfolio.Sum())}
+			i := Acc{a.Id, a.Name, tinvest.SumFloat(pfl.TotalAmountPortfolio.Sum())}
 			htmlData.Accs = append(htmlData.Accs, i)
-			htmlData.Total += SumFloat(i.Total)
+			htmlData.Total += tinvest.SumFloat(i.Total)
 		}
 
 		err = tmpl.Execute(w, htmlData)
@@ -280,8 +275,8 @@ func main() {
 				pfl := operations.GetPortfolio(bearer_token, a.Id)
 				accDetail.Account.Id = a.Id
 				accDetail.Account.Name = a.Name
-				accDetail.Account.Total = SumFloat(pfl.TotalAmountPortfolio.Sum())
-				accDetail.DailyYield = SumFloat(pfl.DailyYield.Sum())
+				accDetail.Account.Total = tinvest.SumFloat(pfl.TotalAmountPortfolio.Sum())
+				accDetail.DailyYield = tinvest.SumFloat(pfl.DailyYield.Sum())
 				accDetail.Pos = operations.GetPositions(bearer_token, accId)
 				break
 			}

@@ -45,7 +45,7 @@ require (
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/term v0.29.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
-	ldv/tinvest v0.0.0-00010101000000-000000000000 // indirect
+	ldv/tinvest v0.0.0-00010101000000-000000000000
 	ldv/tinvest/instruments v0.0.0-00010101000000-000000000000 // indirect
 	modernc.org/libc v1.66.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect

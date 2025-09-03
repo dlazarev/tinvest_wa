@@ -1,33 +1,29 @@
 package main
 
 import (
+	"ldv/tinvest"
 	"ldv/tinvest/operations"
-	"log"
 )
 
 func addOperationsBySecurity(token string, accDetail *AccDetail) {
 	var opers operations.Opers
-	for _, sec := range accDetail.Pos.Securities {
-		opers = operations.GetOperations(token, accDetail.Account.Id, sec.Figi)
-		beginQuantity := 0
-		lenOpers := len(opers.Operations) - 1
-		zeroIndex := lenOpers
-		for i := lenOpers; i >=0; i-- {
-			switch opers.Operations[i].OperationType {
-			case "OPERATION_TYPE_BUY":
+	for i := 0; i < len(accDetail.Pos.Securities); i++ {
+		opers = operations.GetOperations(token, accDetail.Account.Id, accDetail.Pos.Securities[i].Figi)
+		totalSum := 0.0
+		totalQuantity := 0
+		for i, oper := range opers.Operations {
+			switch oper.OperationType {
+			case "OPERATION_TYPE_BUY", "OPERATION_TYPE_BUY_CARD":
 				for _, trade := range opers.Operations[i].Trades {
-					beginQuantity += int(trade.Quality)
+					totalQuantity += int(trade.Quality)
+					totalSum += float64(trade.Price.Sum() * float64(trade.Quality))
 				}
-			case "OPERATION_TYPE_SELL":
-				for _, trade := range opers.Operations[i].Trades {
-					beginQuantity -= int(trade.Quality)
-				}
-			}
-			if beginQuantity == 0 {
-				zeroIndex = lenOpers - i
 			}
 		}
-		log.Printf("%v, zeroIndex = %d\n", sec.Ticker, zeroIndex)
+		if totalQuantity != 0 {
+			accDetail.Pos.Securities[i].WeightedAveragePrice = tinvest.SumFloat(totalSum / float64(totalQuantity))
+		}
+		//		log.Printf("%v, zeroIndex = %d\n", sec.Ticker, zeroIndex)
 	}
 
 }
