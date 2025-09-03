@@ -274,7 +274,6 @@ func main() {
 		}
 
 		var accDetail AccDetail
-
 		accId := (r.URL.Query().Get("id"))
 		for _, a := range accounts.Accounts {
 			if a.Id == accId {
@@ -288,6 +287,7 @@ func main() {
 			}
 		}
 
+		addOperationsBySecurity(bearer_token, &accDetail)
 		updateLogo(&accDetail)
 
 		err = tmpl.Execute(w, accDetail)

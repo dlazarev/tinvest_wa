@@ -11,12 +11,13 @@
                 {{.Account.Name}} {{.Account.Total}} Доходность {{.DailyYield}}
             </caption>
             <thead><tr>
-            <th>Logo</th><th>Ticker</th><th>Name</th><th>Balance</th>
+            <th>Logo</th><th>Figi</th><th>Ticker</th><th>Name</th><th>Balance</th>
             </tr></thead>
             <tbody>
             {{range .Pos.Securities}}
             <tr>    
                 <td><img src="images/{{.InstrumentDesc.Brand.LogoName}}"></td>
+                <td>{{.Figi}}</td>
                 <td>{{.Ticker}}</td>
                 <td>{{.InstrumentDesc.Name}}</td>
                 <td class="td-right">{{.Balance}}</td>

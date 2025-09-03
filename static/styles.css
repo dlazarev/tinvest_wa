@@ -1,10 +1,10 @@
 body {
-    background-color: rgb(238, 233, 192); 
+    background-color: rgb(247, 244, 227);
     font-family: proxima_novasemibold, sans-serif;
 }
 
 .security {
-    width: 100%;
+    width: 60%;
 }
 
 .security caption {
@@ -12,7 +12,7 @@ body {
     font-family: proxima_novasemibold, sans-serif;
     font-size: 18px;
     font-weight: bold;
-    background-color: hsl(96, 32%, 64%);
+    background-color: bisque
 }
 
 .security thead {
@@ -20,7 +20,7 @@ body {
     font-family: proxima_novasemibold, sans-serif;
     font-size: 16px;
     font-weight: bold;
-    background-color: hsl(96, 32%, 64%);
+    background-color: bisque
 }
 
 .security tbody td:nth-child(1) {
@@ -29,17 +29,22 @@ body {
 }
 
 .security tbody td:nth-child(2) {
+  width: 6%;
+  text-align: center;
+}
+
+.security tbody td:nth-child(3) {
   width: 10%;
   text-align: center;
 }
 
 .security tbody td:nth-child(4) {
-  width: 6%;
-  text-align: right;
+  width: 46%;
+  text-align: left;
 }
 
 .security td {
-    background-color: rgb(202, 247, 173);
+    background-color: azure;
     border: 1px solid rgb(224, 231, 219);
     font-family: proxima_novasemibold, sans-serif;
     font-size: 18px;
