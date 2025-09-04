@@ -68,7 +68,7 @@ func logoActual(figi, url, logoName string) bool {
 		logoPath := filepath.Join(basePath, imagePath, logoName)
 		if _, err := os.Stat(logoPath); os.IsNotExist(err) {
 			if err = os.WriteFile(logoPath, data, 0644); err != nil {
-					log.Fatalf("Error writing file logo: %v", err)
+				log.Fatalf("Error writing file logo: %v", err)
 			}
 		}
 	}

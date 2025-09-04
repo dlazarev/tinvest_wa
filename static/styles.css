@@ -43,6 +43,16 @@ body {
   text-align: left;
 }
 
+.security tbody td:nth-child(5) {
+  width: 10%;
+  text-align: right;
+}
+
+.security tbody td:nth-child(6) {
+  width: 10%;
+  text-align: right;
+}
+
 .security td {
     background-color: azure;
     border: 1px solid rgb(224, 231, 219);
