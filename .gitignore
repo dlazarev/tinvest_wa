@@ -4,3 +4,4 @@ images/
 t-invest.ini
 t-invest.sqlite
 tinvest_wa
+__debug_bin*
