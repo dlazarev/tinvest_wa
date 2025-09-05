@@ -33,8 +33,6 @@ func initDatabase(dbPath string) error {
 		return err
 	}
 
-	//defer db.Close()
-
 	_, err = db.ExecContext(context.Background(),
 		`CREATE TABLE IF NOT EXISTS securityLogo (
 				figi TEXT PRIMARY KEY,

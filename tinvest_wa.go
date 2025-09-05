@@ -217,6 +217,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
 	bearer_token = ini.String("Authorization.token")
 	accounts = users.GetAccounts(bearer_token)
