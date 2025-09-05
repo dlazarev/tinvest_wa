@@ -29,6 +29,12 @@ func initDatabase(dbPath string) error {
 		return nil
 	}
 
+	if err = db.Ping(); err != nil {
+		return err
+	}
+
+	//defer db.Close()
+
 	_, err = db.ExecContext(context.Background(),
 		`CREATE TABLE IF NOT EXISTS securityLogo (
 				figi TEXT PRIMARY KEY,
