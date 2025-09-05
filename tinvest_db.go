@@ -51,6 +51,17 @@ func initDatabase(dbPath string) error {
 
 //************************************************************************
 
+func checkImagePath() {
+	fullImagePath := filepath.Join(basePath, imagePath)
+	if _, err := os.Stat(fullImagePath); os.IsNotExist(err) {
+		if err := os.Mkdir(fullImagePath, 0755); err != nil {
+			log.Fatalf("Error mkdir for images: %v", err)
+		}
+	}
+}
+
+//************************************************************************
+
 func logoActual(figi, url, logoName string) bool {
 	row := db.QueryRowContext(context.Background(),
 		`SELECT dateStore, data FROM securityLogo WHERE figi=?`, figi)
@@ -71,6 +82,7 @@ func logoActual(figi, url, logoName string) bool {
 	futureDate := now.AddDate(0, 0, 28)
 	if dateStore.Before(futureDate) {
 		// Let's check if the logo file is present in the folder.
+		checkImagePath()
 		logoPath := filepath.Join(basePath, imagePath, logoName)
 		if _, err := os.Stat(logoPath); os.IsNotExist(err) {
 			if err = os.WriteFile(logoPath, data, 0644); err != nil {
