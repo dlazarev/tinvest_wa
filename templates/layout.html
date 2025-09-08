@@ -7,16 +7,20 @@
     </head>
     <body>
         <h1>TINVEST</h1>
-        <table class="table">
+        <div class="divtable">
             {{range .Accs}}
-                <tr>
-                    <td><a class="link" href="acc?id={{.Id}}">{{.Id}}</td><td>{{.Name}}</td><td id="acc_{{.Id}}" class="td-right">{{.Total}}</a></td>
-                </tr>
+                <div class="divrow">
+                    <div class="cell"><a class="link" href="acc?id={{.Id}}">{{.Id}}</a></div>
+                        <div class="cell">{{.Name}}</div>
+                       <div class="cellright" id="acc_{{.Id}}">{{.Total}}</div>
+                </div>
             {{end}}
-            <tr>
-                <th id="totalSum" class="th-footer" colspan="3">{{.Total}}</th>
-            </tr>
-        </table>
+            <div class="divfooter">
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cellright" id="totalSum">{{.Total}}</div>
+            </div>
+        </div>
         <script>
             const totalSum = document.getElementById('totalSum');
 

@@ -62,7 +62,7 @@ func checkImagePath() {
 
 func logoActual(figi, url, logoName string) bool {
 	row := db.QueryRowContext(context.Background(),
-		`SELECT dateStore, data FROM securityLogo WHERE figi=?`, figi)
+		`SELECT dateStore, data FROM securityLogo WHERE figi=? AND data IS NOT NULL`, figi)
 
 	var dateStore time.Time
 	var now = time.Now()
@@ -70,7 +70,7 @@ func logoActual(figi, url, logoName string) bool {
 
 	err := row.Scan(&dateStore, &data)
 	if errors.Is(err, sql.ErrNoRows) {
-		sql := `INSERT INTO securityLogo (figi, url, dateStore) VALUES (?,?,?);`
+		sql := `INSERT OR REPLACE INTO securityLogo (figi, url, dateStore) VALUES (?,?,?);`
 		if _, err := db.ExecContext(context.Background(), sql, figi, url, now); err != nil {
 			log.Fatalf("Error insert sqlite record: %v", err)
 		}

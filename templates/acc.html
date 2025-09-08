@@ -6,25 +6,16 @@
         <link rel="stylesheet" href="/static/styles.css" />
     </head>
     <body>
-        <table class="security">
-            <caption>
-                {{.Account.Name}} {{.Account.Total}} Доходность {{.DailyYield}}
-            </caption>
-            <thead><tr>
-            <th>Logo</th><th>Figi</th><th>Ticker</th><th>Name</th><th>Balance</th><th>WAP</th>
-            </tr></thead>
-            <tbody>
+        <h1>{{.Account.Name}} {{.Account.Total}} Доходность {{.DailyYield}}</h1>
+        <div class="divtable">
             {{range .Pos.Securities}}
-            <tr>    
-                <td><img class="logo" src="images/{{.InstrumentDesc.Brand.LogoName}}"></td>
-                <td>{{.Figi}}</td>
-                <td>{{.Ticker}}</td>
-                <td>{{.InstrumentDesc.Name}}</td>
-                <td class="td-right">{{.Balance}}</td>
-                <td class="td-right">{{.WeightedAveragePrice}}</td>
-            </tr>
+            <div class="divrow">
+                <div class="cell"><img class="logo" src="images/{{.InstrumentDesc.Brand.LogoName}}"></div>
+                <div class="cell">{{.InstrumentDesc.Name}}<br><div class="smallfont">{{.Ticker}}</div></div>
+                <div class="cellright">{{.Balance}}</div>
+                <div class="cellright">{{.WeightedAveragePrice}}</div>
+            </div>
             {{end}}
-            </tbody>
-        </table>
+        </div>
     </body>
 </html>
