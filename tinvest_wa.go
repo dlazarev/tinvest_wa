@@ -285,6 +285,7 @@ func main() {
 
 		addOperationsBySecurity(bearer_token, &accDetail)
 		updateLogo(&accDetail)
+		getActualPrices(bearer_token, &accDetail)
 
 		err = tmpl.Execute(w, accDetail)
 		if err != nil {

@@ -10,9 +10,12 @@ replace ldv/tinvest/operations => ../ldv/tinvest/operations
 
 replace ldv/tinvest/instruments => ../ldv/tinvest/instruments
 
+replace ldv/tinvest/marketdataservice => ../ldv/tinvest/marketdataservice
+
 require (
 	github.com/gookit/ini/v2 v2.3.1
 	github.com/gorilla/websocket v1.5.3
+	ldv/tinvest/marketdataservice v0.0.0-00010101000000-000000000000
 	ldv/tinvest/operations v0.0.0-00010101000000-000000000000
 	ldv/tinvest/users v0.0.0-00010101000000-000000000000
 	modernc.org/sqlite v1.38.2

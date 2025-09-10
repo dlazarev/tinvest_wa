@@ -2,7 +2,9 @@ package main
 
 import (
 	"ldv/tinvest"
+	"ldv/tinvest/marketdataservice"
 	"ldv/tinvest/operations"
+	"log"
 )
 
 func addOperationsBySecurity(token string, accDetail *AccDetail) {
@@ -26,4 +28,15 @@ func addOperationsBySecurity(token string, accDetail *AccDetail) {
 		//		log.Printf("%v, zeroIndex = %d\n", sec.Ticker, zeroIndex)
 	}
 
+}
+
+func getActualPrices(token string, accDetail *AccDetail) {
+	var figies []string
+
+	for _, sec := range accDetail.Pos.Securities {
+		figies = append(figies, sec.Figi)
+	}
+
+	lastPrices := marketdataservice.GetLastPrices(token, figies)
+	log.Println(lastPrices)
 }
