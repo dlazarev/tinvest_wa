@@ -4,7 +4,6 @@ import (
 	"ldv/tinvest"
 	"ldv/tinvest/marketdataservice"
 	"ldv/tinvest/operations"
-	"log"
 )
 
 func addOperationsBySecurity(token string, accDetail *AccDetail) {
@@ -38,5 +37,17 @@ func getActualPrices(token string, accDetail *AccDetail) {
 	}
 
 	lastPrices := marketdataservice.GetLastPrices(token, figies)
-	log.Println(lastPrices)
+
+	for i := 0; i < len(accDetail.Pos.Securities); i++ {
+		accDetail.Pos.Securities[i].LastPrice = findLastPriceByUid(accDetail.Pos.Securities[i].PositionUid, &lastPrices)
+	}
+}
+
+func findLastPriceByUid(uid string, lp *marketdataservice.Prices) tinvest.SumFloat {
+	for _, price := range lp.LastPrices {
+		if price.InstrumentUid == uid {
+			return tinvest.SumFloat(price.Price.Sum())
+		}
+	}
+	return 0.0
 }
