@@ -11,9 +11,9 @@
             {{range .Pos.Securities}}
             <div class="divrow">
                 <div class="cell"><img class="logo" src="images/{{.InstrumentDesc.Brand.LogoName}}"></div>
-                <div class="cell">{{.InstrumentDesc.Name}}<br><div class="smallfont">{{.Ticker}}</div></div>
+                <div class="cell">{{.InstrumentDesc.Name}}<br><div class="smallfont">{{.Ticker}}</div> <div class="smallfont">{{.Figi}}</div></div>
                 <div class="cellright">{{.Balance}}</div>
-                <div class="cellright">{{.WeightedAveragePrice}}</div>
+                <div class="cellright">{{.WeightedAveragePrice}} &#8594; {{.LastPrice}}</div>
             </div>
             {{end}}
         </div>

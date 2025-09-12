@@ -39,13 +39,16 @@ func getActualPrices(token string, accDetail *AccDetail) {
 	lastPrices := marketdataservice.GetLastPrices(token, figies)
 
 	for i := 0; i < len(accDetail.Pos.Securities); i++ {
-		accDetail.Pos.Securities[i].LastPrice = findLastPriceByUid(accDetail.Pos.Securities[i].PositionUid, &lastPrices)
+		accDetail.Pos.Securities[i].LastPrice = findLastPriceByFigi(accDetail.Pos.Securities[i].Figi, &lastPrices)
+		if accDetail.Pos.Securities[i].InstrumentType == "bond" {
+			accDetail.Pos.Securities[i].LastPrice = accDetail.Pos.Securities[i].LastPrice / 100.0 * tinvest.SumFloat(accDetail.Pos.Securities[i].InstrumentDesc.Nominal.Sum())
+		}
 	}
 }
 
-func findLastPriceByUid(uid string, lp *marketdataservice.Prices) tinvest.SumFloat {
+func findLastPriceByFigi(figi string, lp *marketdataservice.Prices) tinvest.SumFloat {
 	for _, price := range lp.LastPrices {
-		if price.InstrumentUid == uid {
+		if price.Figi == figi {
 			return tinvest.SumFloat(price.Price.Sum())
 		}
 	}
